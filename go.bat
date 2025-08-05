@@ -1,0 +1,1 @@
+npx tailwindcss -i ./Styles/app.css -o ./PetersenTestingApp/wwwroot/app.css

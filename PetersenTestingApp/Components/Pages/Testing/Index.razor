@@ -1,0 +1,265 @@
+﻿@page "/testing"
+@using Microsoft.AspNetCore.Components.QuickGrid
+
+<div class="border rounded-sm bg-white shadow px-4 py-2 ">
+
+    <div class="w-full h-screen flex flex-col">
+
+        <div class="flex justify-between">
+            <h2 class="text-xl font-medium">Testing</h2>
+        </div>
+
+        @if (!Loaded)
+        {
+            @if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <div>@errorMessage</div>
+            }
+            else
+            {
+                <div class="w-full h-4/5 flex align-self-center items-center justify-center  ">
+                    <span class="loader-spinner "></span>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="flex flex-col px-2 space-y-4">
+
+                <div class="flex justify-start space-x-3 text-sm">
+                    
+                    <div>
+                        <label for="closed_status">Closed Status</label>
+                        <select class="text-sm" value="@StatusSearch" @onchange="OnSearchStatus" id="closed_status">
+                            <option value="0">No</option>
+                            <option value="1">Yes</option>
+                            <option value="2" selected>All</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <input class="text-sm" type="text" value="@MoRefSearch" @oninput="OnSearchMoInput" placeholder="mo reference" />
+                    </div>
+                    <div>
+                        <input class="text-sm" type="text" value="@ItemSearch" @oninput="OnSearchItemInput" placeholder="Item Number" />
+                    </div>
+
+                </div>
+
+                <div class="flex justify-between space-x-2">
+
+                    <div class="h-[35vh] overflow-y-auto border border-gray-200 rounded p-2 text-xs">
+
+                    <!-- Header Row -->
+                        <div class="grid grid-cols-[1fr_100px_100px_100px_1fr_100px_100px_100px_100px_100px_100px_100px_100px_1fr] font-semibold border-b border-gray-400 pb-1 mb-1">
+                        <div>CustomerName</div>
+                        <div>Ref Num</div>
+                        <div>Test Num</div>
+                        <div>Item</div>
+                        <div>ItemDesc</div>
+                        <div>Order Date</div>
+                        <div>Due Date</div>
+                        <div>Rated PSI</div>
+                        <div>Deflated Dia</div>
+                        <div>Max Inflated Dia</div>
+                        <div>Closed</div>
+                        <div>Closed Date Time</div>
+                        <div>User</div>
+                        <div>Last Entry</div>
+
+                    </div>
+
+                    @if(isTop && TopListHeaders?.Any() == true)
+                    {               
+                        <!-- Data Rows -->
+                        @foreach (var p in TopListHeaders)
+                        {
+                                <div class="cursor-pointer grid grid-cols-[1fr_100px_100px_100px_1fr_100px_100px_100px_100px_100px_100px_100px_100px_1fr] border-b border-gray-100 py-1 hover:bg-gray-50">
+                                <div class="whitespace-nowrap overflow-hidden text-ellipsis" @onclick="()=>GetItemData(p.HeaderId)">@p.CustomerName</div>
+                                <div @onclick="()=>GetItemData(p.HeaderId)">@p.ReferenceNumber</div>
+                                <div @onclick="()=>GetItemData(p.HeaderId)">@p.TestNumber</div>
+                                <div @onclick="()=>GetItemData(p.HeaderId)">@p.Item</div>
+                                <div class="whitespace-nowrap overflow-hidden text-ellipsis" @onclick="()=>GetItemData(p.HeaderId)">@p.ItemDesc</div>
+                                <div @onclick="()=>GetItemData(p.HeaderId)">@p.ORDDate?.ToString("MM-dd-yyyy")</div>
+                                <div @onclick="()=>GetItemData(p.HeaderId)">@p.DueDate?.ToString("MM-dd-yyyy")</div>
+                                <div @onclick="()=>GetItemData(p.HeaderId)">@p.RatedMaxInflationPSI</div>
+                                <div @onclick="()=>GetItemData(p.HeaderId)">@p.DeflatedOrInternalDiaInches</div>
+                                <div @onclick="()=>GetItemData(p.HeaderId)">@p.MaxInflatedDiaInches</div>
+                                <div @onclick="()=>GetItemData(p.HeaderId)">@p.Closed</div>
+                                <div class="whitespace-nowrap overflow-hidden text-ellipsis" @onclick="()=>GetItemData(p.HeaderId)">@p.ClosedDT</div> 
+                                <div @onclick="()=>GetItemData(p.HeaderId)">@p.AudtUser</div>
+                                <div @onclick="()=>GetItemData(p.HeaderId)">@p.LastEntryDate</div>
+                            </div>
+                        }
+                    
+                    }
+
+                    else if (!isTop && FilteredHeaders?.Any() == true)
+                    {
+
+                        <!-- Data Rows -->
+                        @foreach (var p in FilteredHeaders)
+                        {
+                            <div class="cursor-pointer grid grid-cols-[1fr_100px_100px_100px_1fr_100px_100px_100px_100px_100px_100px_100px_100px] border-b border-gray-100 py-1 hover:bg-gray-50 ">
+                                <div class="whitespace-nowrap overflow-hidden text-ellipsis" @onclick="()=>GetItemData(p.HeaderId)">@p.CustomerName</div>
+                                <div @onclick="()=>GetItemData(p.HeaderId)">@p.ReferenceNumber</div>
+                                <div @onclick="()=>GetItemData(p.HeaderId)">@p.TestNumber</div>
+                                <div @onclick="()=>GetItemData(p.HeaderId)">@p.Item</div>
+                                <div class="whitespace-nowrap overflow-hidden text-ellipsis" @onclick="()=>GetItemData(p.HeaderId)">@p.ItemDesc</div>
+                                <div @onclick="()=>GetItemData(p.HeaderId)">@p.ORDDate?.ToString("MM-dd-yyyy")</div>
+                                <div @onclick="()=>GetItemData(p.HeaderId)">@p.DueDate?.ToString("MM-dd-yyyy")</div>
+                                <div @onclick="()=>GetItemData(p.HeaderId)">@p.RatedMaxInflationPSI</div>
+                                <div @onclick="()=>GetItemData(p.HeaderId)">@p.DeflatedOrInternalDiaInches</div>
+                                <div @onclick="()=>GetItemData(p.HeaderId)">@p.MaxInflatedDiaInches</div>
+                                <div @onclick="()=>GetItemData(p.HeaderId)">@p.Closed</div>
+                                <div class="whitespace-nowrap overflow-hidden text-ellipsis" @onclick="()=>GetItemData(p.HeaderId)">@p.ClosedDT</div> 
+                                <div @onclick="()=>GetItemData(p.HeaderId)">@p.AudtUser</div>
+                                    
+                            </div>
+                        }
+
+                    }
+
+                    else
+                    {
+                        <div class="grid grid-cols-[1fr_100px_100px_100px_1fr_100px_100px_100px_100px_100px_100px_100px_100px_1fr]  text-center text-gray-500 py-4">
+                            No items to display.
+                        </div>
+                    }
+
+                    
+
+                    </div>
+
+                    <button type="button" @onclick="showTopData" class="h-8 w-20 px-1 shadow bg-gray-600  text-sm rounded-xsm hover:bg-gray-800">
+                        Top 50
+                    </button>
+
+
+                </div>
+
+
+                <div class="bg-white border rounded shadow-sm text-sm">
+                    <div class="flex justify-between px-2">
+                        <div>
+                            <label>Ref Num:</label><span>@currentTestObject.ReferenceNumber</span>
+                        </div>
+                        <div>
+                            <label>Item:</label><span>@currentTestObject.Item</span>
+                        </div>
+                        <div>
+                            <label>Description:</label><span>@currentTestObject.ItemDesc</span>
+                        </div>
+                        <div>
+                            <label>Test #:</label><span>@currentTestObject.TestNumber</span>
+                        </div>
+                        <div>
+                            <label>Header ID:</label><span>@currentTestObject.HeaderId</span>
+                        </div>
+                        <div>
+                            <label>ORD UNIQ:</label><span>@currentTestObject.ORDUNIQ</span>
+                        </div>
+                    </div>
+                    <div class="flex justify-between px-2">
+                        <div>
+                            <label>Customer:</label><span>@currentTestObject.Customer</span>
+                        </div>
+                        <div>
+                            <label>Name:</label><span>@currentTestObject.CustomerName</span>
+                        </div>
+                        <div>
+                            <label>Rated PSI:</label><span>@currentTestObject.RatedMaxInflationPSI</span>
+                        </div>
+                        <div>
+                            <label>Defl. Dia:</label><span>@currentTestObject.DeflatedOrInternalDiaInches</span>
+                        </div>
+                        <div>
+                            <label>Max Inflated Dia:</label><span>@currentTestObject.MaxInflatedDiaInches</span>
+                        </div>
+                        <button class="px-2 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700">
+                            Next Test #
+                        </button>
+                    </div>
+                </div>             
+
+
+                <div class="flex justify-between">
+
+                    <div class="border">
+
+                        <div class="grid grid-cols-[100px_100px_100px_1fr_100px_100px_100px_100px_100px_100px] font-semibold border-b border-gray-400 pb-1 mb-1">
+                            <div>Start Date</div>
+                            <div>Start Time</div>
+                            <div>Infl. Press (PSIG)</div>
+                            <div>Inflation Medium</div>
+                            <div>Area Temp</div>
+                            <div>Test Status</div>
+                            <div>Failure Reason</div>
+                            <div>User</div>
+                            <div>End Date</div>
+                            <div>End Time</div>
+                        </div>
+                        
+                        @if (list_InflationPressures?.Any() == true)
+                        {
+                            @foreach(var p in list_InflationPressures)
+                            {
+                                <div class="cursor-pointer grid grid-cols-[100px_100px_100px_1fr_100px_100px_100px_100px_100px_100px]  border-b border-gray-100 py-1 hover:bg-gray-50">
+                                    <div>@p.StartTestDateTime.ToString("MM-dd-yyyy")</div>
+                                    <div>@p.StartTestDateTime.ToString("hh:mm:ss tt")</div>
+                                    <div>@p.InflatedPSIG.ToString("0.##")</div>
+                                    <div>@p.InflationMedium</div>
+                                    <div>@p.AreaTempFahrenheit.ToString("0.##")</div>
+                                    <div>@p.TestStatus</div>
+                                    <div>@p.FailureReason</div>
+                                    <div>@p.AUDTUser</div>
+                                    <div>@p.EndTestDateTime?.ToString("MM-dd-yyyy")</div>
+                                    <div>@p.EndTestDateTime?.ToString("hh:mm:ss tt")</div>
+                                </div>
+                            }
+
+                        }
+
+                    </div>
+
+                    <div class="border p-2 space-y-2 text-sm">
+                        
+                        <div class="flex">
+                            <label class="block text-xs font-medium text-gray-600">Start Test Date/Time</label>
+                            <input type="datetime-local" @bind="currentInflationPress.StartTestDateTime"/>
+                        </div>
+                        <!--
+                        <div class="flex">
+                            <div>
+                                <label>User</label> 
+                                <select @bind="currentInflationPress.AUDUser">
+                                    @foreach(var user in users)
+                                    {
+                                        <option value="@user.UserId" >@user.Name</option>
+                                    }
+                                </select>
+                            </div>
+                            <div>
+                                <label>Initial</label>
+                            </div>
+                       
+                        </div>
+                        -->
+                    </div>
+
+
+
+                </div>
+
+                
+            </div>
+
+            
+
+            
+        }
+
+
+
+    </div>
+</div>

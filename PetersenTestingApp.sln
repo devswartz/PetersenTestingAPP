@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36202.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetersenTestingApp", "PetersenTestingApp\PetersenTestingApp.csproj", "{91E58EF6-5AD1-4528-B7E7-DDFC3968D5AD}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C39537FF-E272-4091-9642-B0142FC1F3E8} = {C39537FF-E272-4091-9642-B0142FC1F3E8}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetersenTestingAppLibrary", "PetersenTestingAppLibrary\PetersenTestingAppLibrary.csproj", "{C39537FF-E272-4091-9642-B0142FC1F3E8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{91E58EF6-5AD1-4528-B7E7-DDFC3968D5AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91E58EF6-5AD1-4528-B7E7-DDFC3968D5AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91E58EF6-5AD1-4528-B7E7-DDFC3968D5AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91E58EF6-5AD1-4528-B7E7-DDFC3968D5AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C39537FF-E272-4091-9642-B0142FC1F3E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C39537FF-E272-4091-9642-B0142FC1F3E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C39537FF-E272-4091-9642-B0142FC1F3E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C39537FF-E272-4091-9642-B0142FC1F3E8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {24355921-5D4B-48F6-BBDE-60DCC5F9E9E5}
+	EndGlobalSection
+EndGlobal
