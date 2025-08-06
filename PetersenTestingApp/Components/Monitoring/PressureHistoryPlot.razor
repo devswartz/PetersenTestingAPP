@@ -1,42 +1,96 @@
-﻿<h4>Historical Pressure Plot</h4>
+﻿<div class="p-4 border bg-light rounded mb-4">
+    <h5 class="mb-3">Select Sensor and Date Range</h5>
+    <EditForm Model="@query" OnValidSubmit="OnQuerySubmit">
+        <div class="mb-2">
+            <label>Sensor ID</label>
+            <InputText @bind-Value="query.SensorId" class="form-control" />
+        </div>
 
-<EditForm Model="@query" OnValidSubmit="OnQuerySubmit">
-    <InputText @bind-Value="query.SensorId" placeholder="Sensor ID" />
-    <InputDate @bind-Value="query.StartDate" />
-    <InputDate @bind-Value="query.EndDate" />
-    <button type="submit">Plot</button>
-</EditForm>
+        <div class="mb-2">
+            <label>Start Date / Time</label>
+            <InputDate @bind-Value="query.StartDate" class="form-control" />
+            <InputDate Type="InputDateType.Time" @bind-Value="query.StartDate" class="form-control mt-1" />
+        </div>
+
+        <div class="mb-2">
+            <label>End Date / Time</label>
+            <InputDate @bind-Value="query.EndDate" class="form-control" />
+            <InputDate Type = "InputDateType.Time" @bind-Value="query.EndDate" class="form-control mt-1" />
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3">Plot</button>
+    </EditForm>
+</div>
 
 @if (plotData?.Any() == true)
 {
-    <p>Plot would render here (placeholder)</p>
-    <!-- Replace with actual chart later -->
+    <LineChart @ref="chart" TItem="double" Options="chartOptions" />
 }
-else if (plotData is not null)
+else if (plotData != null)
 {
-    <p>No results found.</p>
+    <p class="text-muted">No data found for the selected sensor and date range.</p>
 }
+
 
 @code {
-
-    private PlotQuery query = new();
+    private LineChart<double> chart;
     private List<SensorReading> plotData;
 
-    private async Task OnQuerySubmit()
+
+    private LineChartOptions chartOptions = new()
     {
-        // Replace with your real query logic later
-        plotData = await DashboardBackendService.GetLatestSensorReadingsAsync();
+        Responsive = true,
+        Plugins = new()
+        {
+            Title = new()
+            {
+                Display = true,
+                Text = "Pressure Over Time"
+            }
+        }
+    };
+
+    private PlotQuery query = new()
+    {
+        StartDate = DateTime.UtcNow.AddHours(-12),
+        EndDate = DateTime.UtcNow
+    };
+
+    async Task OnQuerySubmit()
+    {
+        plotData = await DashboardBackendService
+    .GetSensorReadingsForDateRangeAsync(query.SensorId, query.StartDate, query.EndDate);
+
+        StateHasChanged(); // force rerender so chart appears
+
+        await Task.Delay(50); // give it time to render and bind @ref
+
+        if (chart != null)
+        {
+            await chart.Clear();
+
+            var labels = plotData.Select(p => p.TimeStamp.ToString("yyyy-MM-dd HH:mm")).ToList();
+            var values = plotData.Select(p => (double)p.PressurePSI).ToList();
+
+            await chart.AddLabelsDatasetsAndUpdate(
+                labels,
+                new LineChartDataset<double>
+                {
+                    Label = "Pressure (PSI)",
+                    Data = values,
+                    Fill = false,
+                    BackgroundColor = "#007bff",
+                    BorderWidth = 2
+                });
+        }
+
+
     }
+
     public class PlotQuery
     {
         public string SensorId { get; set; }
-        public DateTime StartDate { get; set; } = DateTime.UtcNow.AddDays(-1);
-        public DateTime EndDate { get; set; } = DateTime.UtcNow;
-    }
-
-    public class PressureReading
-    {
-        public DateTime Timestamp { get; set; }
-        public double Pressure { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
     }
 }

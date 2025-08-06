@@ -1,0 +1,80 @@
+﻿@page "/monitoring"
+@using PetersenTestingApp.Components.Monitoring
+@using Blazorise.Charts
+@inject DashboardBackendService DashboardBackendService
+
+<h2 class="text-2xl font-semibold mb-4">Pressure Monitoring Dashboard</h2>
+
+<!-- Live Sensor Dashboard -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+    @foreach (var reading in liveReadings)
+    {
+        <div class="border rounded-lg shadow p-4 bg-white">
+            <h3 class="text-lg font-medium mb-2">Sensor @reading.SensorID</h3>
+            <p class="text-sm text-gray-500">@reading.TimeStamp.ToString("yyyy-MM-dd HH:mm:ss")</p>
+
+            <!-- Pressure Gauge -->
+            <div class="mt-3">
+                <label class="text-sm font-medium">Pressure (PSI)</label>
+                <div class="w-full h-4 bg-gray-200 rounded-full">
+                    <div class="h-full rounded-full bg-blue-500" style="width:@(Math.Min(reading.PressurePSI * 2, 100))%"></div>
+                </div>
+                <div class="text-xs text-right text-gray-600">@reading.PressurePSI PSI</div>
+            </div>
+
+            <!-- Battery Gauge -->
+            <div class="mt-3">
+                <label class="text-sm font-medium">Battery (V)</label>
+                <div class="w-full h-4 bg-gray-200 rounded-full">
+                    <div class="h-full rounded-full @(reading.BatteryVoltage < 3.5 ? "bg-red-500" : "bg-green-500")" style="width:@(Math.Min((reading.BatteryVoltage / 4.2) * 100, 100))%"></div>
+                </div>
+                <div class="text-xs text-right text-gray-600">@reading.BatteryVoltage V</div>
+            </div>
+
+            <!-- Temperature Gauge -->
+            <div class="mt-3">
+                <label class="text-sm font-medium">Temperature (°C)</label>
+                <div class="w-full h-4 bg-gray-200 rounded-full">
+                    <div class="h-full rounded-full @(reading.Temperature > 80 ? "bg-orange-500" : "bg-yellow-400")" style="width:@(Math.Min(reading.Temperature, 100))%"></div>
+                </div>
+                <div class="text-xs text-right text-gray-600">@reading.Temperature °C</div>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Historical Plot -->
+<h3 class="text-xl font-semibold mb-2">Historical Pressure Plot</h3>
+<EditForm Model="@query" OnValidSubmit="OnQuerySubmit">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end mb-4">
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Sensor ID</label>
+            <InputText @bind-Value="query.SensorId" class="form-input w-full" />
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Start Date</label>
+            <InputDate @bind-Value="query.StartDate" class="form-input w-full" />
+            <InputDate Type="InputDateType.Time" @bind-Value="query.StartDate" class="form-input w-full mt-1" />
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-gray-700">End Date</label>
+            <InputDate @bind-Value="query.EndDate" class="form-input w-full" />
+            <InputDate Type="InputDateType.Time" @bind-Value="query.EndDate" class="form-input w-full mt-1" />
+        </div>
+
+        <div>
+            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                Plot
+            </button>
+        </div>
+    </div>
+</EditForm>
+
+@if (plotData?.Any() == true)
+{
+    <div class="bg-white rounded shadow p-4">
+        <LineChart @ref="chart" TItem="double" Options="chartOptions" />
+    </div>
+}
