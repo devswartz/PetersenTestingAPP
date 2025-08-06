@@ -23,6 +23,7 @@ builder.Services.AddSingleton<PetersenTestingAppLibrary.Classes.Utils>(new Peter
 builder.Services.AddScoped(ServiceProvider => new UserService(ServiceProvider.GetRequiredService<PetersenTestingAppLibrary.Classes.Utils>()));
 builder.Services.AddScoped(ServiceProvider => new BackendService(ServiceProvider.GetRequiredService<PetersenTestingAppLibrary.Classes.Utils>()));
 builder.Services.AddScoped(ServiceProvider => new TestingService(ServiceProvider.GetRequiredService<PetersenTestingAppLibrary.Classes.Utils>()));
+builder.Services.AddScoped(ServiceProvider => new DashboardBackendService(ServiceProvider.GetRequiredService<PetersenTestingAppLibrary.Classes.Utils>()));
 
 builder.Services.TryAddEnumerable(
     ServiceDescriptor.Scoped<CircuitHandler, UserCircuitHandler>());

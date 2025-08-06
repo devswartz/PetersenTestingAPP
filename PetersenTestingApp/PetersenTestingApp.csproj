@@ -20,8 +20,4 @@
     <ProjectReference Include="..\PetersenTestingAppLibrary\PetersenTestingAppLibrary.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Components\Pages\NewFolder\" />
-  </ItemGroup>
-
 </Project>

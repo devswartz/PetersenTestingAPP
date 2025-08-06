@@ -1,0 +1,43 @@
+﻿<h4>Historical Pressure Plot</h4>
+
+<EditForm Model="@query" OnValidSubmit="OnQuerySubmit">
+    <InputText @bind-Value="query.SensorId" placeholder="Sensor ID" />
+    <InputDate @bind-Value="query.StartDate" />
+    <InputDate @bind-Value="query.EndDate" />
+    <button type="submit">Plot</button>
+</EditForm>
+
+@if (plotData?.Any() == true)
+{
+    <p>Plot would render here (placeholder)</p>
+    <!-- Replace with actual chart later -->
+}
+else if (plotData is not null)
+{
+    <p>No results found.</p>
+}
+
+@code {
+
+    private PlotQuery query = new();
+    private List<SensorReading> plotData;
+
+    private async Task OnQuerySubmit()
+    {
+        // Replace with your real query logic later
+        plotData = await DashboardBackendService.GetLatestSensorReadingsAsync();
+    }
+    public class PlotQuery
+    {
+        public string SensorId { get; set; }
+        public DateTime StartDate { get; set; } = DateTime.UtcNow.AddDays(-1);
+        public DateTime EndDate { get; set; } = DateTime.UtcNow;
+    }
+
+    public class PressureReading
+    {
+        public DateTime Timestamp { get; set; }
+        public double Pressure { get; set; }
+    }
+}
+
