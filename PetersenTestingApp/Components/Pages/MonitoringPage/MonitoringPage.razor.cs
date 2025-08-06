@@ -33,7 +33,26 @@ public partial class MonitoringPage : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        liveReadings = await DashboardBackendService.GetLatestSensorReadingsAsync();
+        var readings = await DashboardBackendService.GetLatestSensorReadingsAsync();
+
+        var cutoff = DateTime.UtcNow.AddHours(-12);
+
+        var recent = readings
+            .Where(r => r.TimeStamp >= cutoff)
+            .OrderByDescending(r => r.TimeStamp)
+            .ToList();
+
+        if (recent.Count < 5)
+        {
+            liveReadings = readings
+                .OrderByDescending(r => r.TimeStamp)
+                .Take(5)
+                .ToList();
+        }
+        else
+        {
+            liveReadings = recent;
+        }
     }
 
     private async Task OnQuerySubmit()
