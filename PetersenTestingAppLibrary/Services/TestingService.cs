@@ -71,10 +71,6 @@ namespace PetersenTestingAppLibrary.Services
             await DataSyncTestHeader(); // sync Database with most update data
 
             List<TestHeader> list = new List<TestHeader>();
-            //string query = @"SELECT TOP 50 HeaderId,ORDUNIQ,ReferenceNumber,Item,ItemDesc,RatedMaxInflationPSI,DeflatedOrInternalDiaInches,MaxInflatedDiaInches,Customer,CustomerName,Closed,ClosedDT,AUDTTime,AUDTUser,
-            //                CASE WHEN ISDATE(CONVERT(varchar(8), ORDDATE)) = 1 THEN CONVERT(datetime, CONVERT(varchar(8), ORDDATE), 112) ELSE NULL END AS ORDDATE,
-            //                CASE WHEN ISDATE(CONVERT(varchar(8), DueDate)) = 1 THEN CONVERT(datetime, CONVERT(varchar(8), DueDate), 112) ELSE NULL END AS DueDate,
-            //                SONUM,TestNumber,NotForTest,CustomParam,Channel  FROM PETERSENTESTING.DBO.TESTHEADER ORDER BY ClosedDT  desc";
             string query = @"
                             with combinedDetails As (
                             select HeaderID, TestTime from PETERSENTESTING.dbo.TestDetail_InflationPressure
@@ -349,6 +345,61 @@ namespace PetersenTestingAppLibrary.Services
             }
 
             return list;
+        }
+
+
+        public async Task<TestDetail_InflationPressure> GetItemInflationPressure(int DetailID)
+        {
+
+            TestDetail_InflationPressure data = new TestDetail_InflationPressure();
+
+            const string query = @" SELECT *
+                                FROM PETERSENTESTING.dbo.TestDetail_InflationPressure
+                                WHERE DetailID=@DetailID";
+
+            using (var conn = new SqlConnection(utils.sqlServerConnection))
+            {
+                await conn.OpenAsync();
+
+                using (var cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@DetailID", DetailID);
+
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+                            data = (new TestDetail_InflationPressure
+                            {
+                                DetailID = Convert.ToInt32(reader["DetailID"]),
+                                HeaderID = Convert.ToInt32(reader["HeaderID"]),
+                                ReferenceNumber = reader["ReferenceNumber"].ToString(),
+                                ORDUNIQ = Convert.ToInt32(reader.GetDecimal(reader.GetOrdinal("ORDUNIQ"))),
+                                Item = reader["Item"].ToString(),
+                                TestDate = reader.IsDBNull(reader.GetOrdinal("TestDate")) ? DateTime.Now : reader.GetDateTime(reader.GetOrdinal("TestDate")),
+                                TestTime = reader.IsDBNull(reader.GetOrdinal("TestTime")) ? DateTime.Now : reader.GetDateTime(reader.GetOrdinal("TestTime")),
+                                StartTestDateTime = reader.IsDBNull(reader.GetOrdinal("StartTestDateTime")) ? DateTime.Now : reader.GetDateTime(reader.GetOrdinal("StartTestDateTime")),
+                                InflatedPSIG = reader.IsDBNull(reader.GetOrdinal("InflatedPSIG")) ? 0m : reader.GetDecimal(reader.GetOrdinal("InflatedPSIG")),
+                                InflationMedium = reader["InflationMedium"].ToString(),
+                                AreaTempFahrenheit = reader.IsDBNull(reader.GetOrdinal("AreaTempFahrenheit")) ? 0m : reader.GetDecimal(reader.GetOrdinal("AreaTempFahrenheit")),
+                                Comments = reader["Comments"].ToString(),
+                                AUDTUser = reader["AUDTUser"].ToString(),
+                                AUDTTime = reader.IsDBNull(reader.GetOrdinal("AUDTTime")) ? DateTime.Now : reader.GetDateTime(reader.GetOrdinal("AUDTTime")),
+                                TestNumber = reader["TestNumber"].ToString(),
+                                Initial = reader["Initial"].ToString(),
+                                TestEndDate = reader.IsDBNull(reader.GetOrdinal("TestEndDate")) ? DateTime.Now : reader.GetDateTime(reader.GetOrdinal("TestEndDate")),
+                                TestEndTime = reader.IsDBNull(reader.GetOrdinal("TestEndTime")) ? DateTime.Now : reader.GetDateTime(reader.GetOrdinal("TestEndTime")),
+                                TestStatus = reader["TestStatus"].ToString(),
+                                FailureReason = reader["FailureReason"].ToString(),
+                                EndTestDateTime = reader.IsDBNull(reader.GetOrdinal("EndTestDateTime")) ? null : reader.GetDateTime(reader.GetOrdinal("EndTestDateTime")),
+                                AUDUser = reader.IsDBNull(reader.GetOrdinal("AUDUser")) ? "0e5640ac-c5d0-4900-b12b-c84760332716" : reader.GetOrdinal("AUDUser").ToString(),
+                            });
+                        }
+                    }
+                }
+            }
+
+            return data;
         }
 
 

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using PetersenTestingAppLibrary.Classes;
 using PetersenTestingAppLibrary.Services;
+using System.Text.RegularExpressions;
 using Timer = System.Timers.Timer;
 
 namespace PetersenTestingApp.Components.Pages.Testing
@@ -25,7 +26,12 @@ namespace PetersenTestingApp.Components.Pages.Testing
         private Timer _debounceTimer { get; set; }
         public TestHeader currentTestObject { get; set; } = new TestHeader();
         public TestDetail_InflationPressure currentInflationPress { get; set; } = new TestDetail_InflationPressure();
+
         public List<PetersenUser> users = new List<PetersenUser>();
+
+        public List<string> InflationMedium = new List<string>() { "AIR", "WATER", "WATER/N2", "AIR/WATER", "AIR/WATER/N2", "N2" };
+        public List<string> TestStatus = new List<string>() { "Testing", "Pretesting", "Pass", "Fail" };
+        public List<string> FailureReason = new List<string>() { "N/A", "ASSEMBLY",  "BLADDER", "BOLTS",  "COVER", "FABRIC PULLING", "FITTING", "SEW SEAM", "SLIPPAGE" , "SWAGE", "TESTING", "TEST FIX" };
 
         protected override async Task OnInitializedAsync()
         {
@@ -34,7 +40,8 @@ namespace PetersenTestingApp.Components.Pages.Testing
             users = await TestingService.GetAllValidUser();
             users = users.OrderBy(x => x.Name).ToList();
 
-            Console.WriteLine(users.Count);
+            currentInflationPress.AUDUser = currentUser.UserId; //initialize AUDUser
+            
             CanTest = currentUser.petersen_testing==1;
             if (!CanTest) {
                 errorMessage = "Error in Disply";
@@ -106,12 +113,42 @@ namespace PetersenTestingApp.Components.Pages.Testing
         {
             _debounceTimer?.Dispose();
         }
-        
+
+        private TestHeader tempHeader;
         public async Task GetItemData(int HeaderId)
         {
             currentTestObject = await TestingService.GetItemdata(HeaderId);
+            tempHeader = currentTestObject;
             list_InflationPressures = await TestingService.GetTestDetailInflationPressure(HeaderId);
 
+        }
+
+        public async Task ShowInflationDetail(int detailId)
+        {
+            currentInflationPress = await TestingService.GetItemInflationPressure(detailId);
+        }
+
+        public async Task OpenFlationDetail(TestHeader data)
+        {
+            currentInflationPress = new TestDetail_InflationPressure();
+            if (data!=null)
+            {
+                currentInflationPress.HeaderID = data.HeaderId;
+                currentInflationPress.ReferenceNumber = data.ReferenceNumber;
+                currentInflationPress.ORDUNIQ = data.ORDUNIQ;
+                currentInflationPress.Item = data.Item;
+                currentInflationPress.AreaTempFahrenheit = 65;
+                currentInflationPress.InflationMedium = InflationMedium[0];
+                currentInflationPress.TestStatus = TestStatus[1];
+                currentInflationPress.FailureReason = FailureReason[0];
+                currentInflationPress.AUDUser = currentUser.UserId;
+                string[] parts = data.RatedMaxInflationPSI.Split(new[] { "psi", "PSI" }, StringSplitOptions.None);
+                if (parts.Length > 0) {
+                    currentInflationPress.InflatedPSIG = int.Parse(parts[0].Trim());
+                }
+                else
+                    currentInflationPress.InflatedPSIG = 0;
+            }
         }
 
 
