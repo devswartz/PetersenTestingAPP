@@ -9,11 +9,15 @@
 
 @code {
     [Parameter] public List<SensorReading> Data { get; set; }
+    private List<SensorReading>? _renderedData;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender && Data?.Any() == true)
+        if (Data?.Any() == true && !ReferenceEquals(Data, _renderedData))
+        {
             await RenderChartAsync();
+            _renderedData = Data;
+        }
     }
 
     private async Task RenderChartAsync()

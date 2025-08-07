@@ -29,30 +29,29 @@
     </div>
 
     <!-- Historical Chart Section -->
-    <div class="mt-12 space-y-4">
-        <h2 class="text-2xl font-bold">Historical Pressure Plot</h2>
+    <div class="mt-12 space-y-4 max-w-4xl mx-auto px-4">
+        <h2 class="text-2xl font-bold text-center">Historical Pressure Plot</h2>
 
-        <EditForm Model="query" OnValidSubmit="OnQuerySubmit" class="grid grid-cols-1 sm:grid-cols-4 gap-4 items-end">
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Sensor ID</label>
-                <InputText @bind-Value="query.SensorId" class="form-input mt-1 block w-full" />
+        <EditForm Model="query" OnValidSubmit="OnQuerySubmit" class="flex flex-wrap gap-4 items-end justify-center">
+            <div class="flex items-center gap-2">
+                <label for="sensorId" class="text-sm font-medium text-gray-700">Sensor ID</label>
+                <InputText id="sensorId" @bind-Value="query.SensorId" class="form-input" />
             </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Start Date / Time</label>
-                <input type="datetime-local"
-                       class="form-input mt-1 block w-full"
-                       @bind="query.StartDate" />
+            <div class="flex items-center gap-2">
+                <label for="startDate" class="text-sm font-medium text-gray-700">Start</label>
+                <input id="startDate" type="datetime-local" class="form-input" @bind="query.StartDate" />
             </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700">End Date / Time</label>
-                <input type="datetime-local"
-                       class="form-input mt-1 block w-full"
-                       @bind="query.EndDate" />
+            <div class="flex items-center gap-2">
+                <label for="endDate" class="text-sm font-medium text-gray-700">End</label>
+                <input id="endDate" type="datetime-local" class="form-input" @bind="query.EndDate" />
             </div>
-            <div>
-                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded w-full">Plot</button>
-            </div>
+            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Plot</button>
         </EditForm>
+
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <p class="text-red-600">@errorMessage</p>
+        }
 
         @if (plotData?.Any() == true)
         {
