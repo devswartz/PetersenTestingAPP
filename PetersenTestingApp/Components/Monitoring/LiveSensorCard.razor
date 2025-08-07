@@ -1,0 +1,33 @@
+<div class="border rounded-lg shadow p-4 bg-white space-y-4">
+    <h3 class="text-lg font-medium">Sensor @Reading.SensorID</h3>
+    <p class="text-xs text-gray-500">Last update: @Reading.TimeStamp.ToString("yyyy-MM-dd HH:mm:ss")</p>
+
+    <div class="space-y-3">
+        <!-- Pressure Gauge -->
+        <div>
+            <label class="block text-sm font-medium">Pressure (PSI)</label>
+            <div class="w-full h-4 bg-gray-200 rounded-full">
+                <div class="h-full rounded-full bg-blue-500" style="width:@(Math.Min(Reading.PressurePSI * 2, 100))%"></div>
+            </div>
+            <div class="text-xs text-right text-gray-600">@Reading.PressurePSI PSI</div>
+        </div>
+
+        <!-- Temperature Gauge -->
+        <div>
+            <label class="block text-sm font-medium">Temperature (°C)</label>
+            <div class="w-full h-4 bg-gray-200 rounded-full">
+                <div class="h-full rounded-full @(Reading.Temperature > 80 ? "bg-red-500" : "bg-yellow-400")" style="width:@(Math.Min(Reading.Temperature, 100))%"></div>
+            </div>
+            <div class="text-xs text-right text-gray-600">@Reading.Temperature °C</div>
+        </div>
+
+        <!-- Battery Gauge -->
+        <div>
+            <label class="block text-sm font-medium">Battery (V)</label>
+            <div class="w-full h-4 bg-gray-200 rounded-full">
+                <div class="h-full rounded-full @(Reading.BatteryVoltage < 3.5 ? "bg-red-500" : "bg-green-500")" style="width:@(Math.Min((Reading.BatteryVoltage / 4.2) * 100, 100))%"></div>
+            </div>
+            <div class="text-xs text-right text-gray-600">@Reading.BatteryVoltage V</div>
+        </div>
+    </div>
+</div>
