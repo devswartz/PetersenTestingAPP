@@ -1,160 +1,106 @@
-<div class="p-4 border bg-light rounded mb-4">
-    <h5 class="mb-3">Select Sensor and Date Range</h5>
-    @if (!string.IsNullOrEmpty(validationMessage))
-    {
-        <div class="alert alert-warning">@validationMessage</div>
-    }
-    <EditForm Model="@query" OnValidSubmit="OnQuerySubmit">
-        <div class="mb-2">
-            <label>Sensor ID</label>
-            <InputText @bind-Value="query.SensorId" class="form-control" />
-        </div>
+@inject IJSRuntime JS
+@using PetersenTestingAppLibrary.Classes
 
-        <div class="mb-2">
-            <label>Start Date / Time</label>
-            <InputDate @bind-Value="startDate" class="form-control" />
-            <InputDate Type="InputDateType.Time" @bind-Value="startTime" class="form-control mt-1" />
-        </div>
-
-        <div class="mb-2">
-            <label>End Date / Time</label>
-            <InputDate @bind-Value="endDate" class="form-control" />
-            <InputDate Type="InputDateType.Time" @bind-Value="endTime" class="form-control mt-1" />
-        </div>
-
-        <button type="submit" class="btn btn-primary mt-3">Plot</button>
-    </EditForm>
-</div>
-
-@if (plotData?.Any() == true)
+@if (Data?.Any() == true)
 {
-    <LineChart @ref="chart" TItem="double" Options="chartOptions" />
-}
-else if (plotData != null)
-{
-    <p class="text-muted">No data found for the selected sensor and date range.</p>
+    <canvas id="pressureChart" style="width: 100%; height: 400px;"></canvas>
+
 }
 
 @code {
-    private LineChart<double> chart;
-    private List<SensorReading> plotData;
-    private string? validationMessage;
+    [Parameter] public List<SensorReading> Data { get; set; }
 
-    private LineChartOptions chartOptions = new()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        Responsive = true,
-        Plugins = new()
-        {
-            Title = new()
-            {
-                Display = true,
-                Text = "Pressure Over Time"
-            }
-        }
-    };
+        if (firstRender && Data?.Any() == true)
+            await RenderChartAsync();
+    }
 
-    private PlotQuery query = new();
-
-    private DateTime startDate = DateTime.UtcNow.AddHours(-12).Date;
-    private DateTime startTime = DateTime.UtcNow.AddHours(-12);
-    private DateTime endDate = DateTime.UtcNow.Date;
-    private DateTime endTime = DateTime.UtcNow;
-
-    async Task OnQuerySubmit()
+    private async Task RenderChartAsync()
     {
-        if (string.IsNullOrWhiteSpace(query.SensorId))
+        Console.WriteLine($"Rendering chart with {Data.Count} readings from {Data.First().TimeStamp} to {Data.Last().TimeStamp}");
+        var labels = Data.Select(p => p.TimeStamp.ToString("o")).ToList();
+        var values = Data.Select(p => p.PressurePSI).ToList();
+
+        var chartData = new
         {
-            validationMessage = "Sensor ID is required.";
-            plotData = null;
-            return;
-        }
-
-        validationMessage = null;
-
-        query.StartDate = startDate.Date + startTime.TimeOfDay;
-        query.EndDate = endDate.Date + endTime.TimeOfDay;
-
-        plotData = await DashboardBackendService
-            .GetSensorReadingsForDateRangeAsync(query.SensorId, query.StartDate, query.EndDate);
-
-        StateHasChanged(); // force rerender so chart appears
-
-        await Task.Delay(50); // give it time to render and bind @ref
-
-        if (chart != null)
-        {
-            await chart.Clear();
-
-            var labels = plotData.Select(p => p.TimeStamp.ToString("o")).ToList();
-            var values = plotData.Select(p => (double)p.PressurePSI).ToList();
-
-            var maxPressure = values.Any() ? values.Max() : 0;
-
-            var totalMinutes = (query.EndDate - query.StartDate).TotalMinutes;
-            int[] intervals = new[] { 1, 5, 15, 30, 60, 360, 720, 1440 };
-            int chosenInterval = intervals.Last();
-            foreach (var candidate in intervals)
+            labels,
+            datasets = new[]
             {
-                var ticks = totalMinutes / candidate;
-                if (ticks >= 10 && ticks <= 25)
-                {
-                    chosenInterval = candidate;
-                    break;
+                new {
+                    label = "Pressure (PSI)",
+                    data = values,
+                    fill = false,
+                    borderColor = "#007bff",
+                    tension = 0.1,
+                    pointRadius = 0,
+                    pointHoverRadius = 4
                 }
             }
+        };
 
-            string unit = "day";
-            int stepSize = 1;
-            if (chosenInterval < 60)
-            {
-                unit = "minute";
-                stepSize = chosenInterval;
-            }
-            else if (chosenInterval < 1440)
-            {
-                unit = "hour";
-                stepSize = chosenInterval / 60;
-            }
+        var totalMinutes = (Data.Last().TimeStamp - Data.First().TimeStamp).TotalMinutes;
+        int stepSize = PickStepSize(totalMinutes);
+        string unit = stepSize < 60 ? "minute" : stepSize < 1440 ? "hour" : "day";
 
-            chartOptions.Scales = new()
+        var chartOptions = new
+        {
+            responsive = true,
+            plugins = new
             {
-                X = new()
+                title = new
                 {
-                    Type = "time",
-                    Time = new()
+                    display = true,
+                    text = "Pressure Over Time"
+                },
+                tooltip = new
+                {
+                    mode = "nearest",
+                    intersect = false
+                }
+            },
+            scales = new
+            {
+                x = new
+                {
+                    type = "time",
+                    time = new
                     {
-                        Unit = unit,
-                        StepSize = stepSize,
-                        DisplayFormats = new()
+                        unit,
+                        stepSize,
+                        displayFormats = new
                         {
-                            Day = "MM/dd HH:mm",
-                            Hour = "MM/dd HH:mm",
-                            Minute = "MM/dd HH:mm"
+                            minute = "HH:mm",
+                            hour = "MM/dd HH:mm",
+                            day = "MM/dd"
                         }
                     },
-                    Ticks = new() { MaxTicksLimit = 25 }
+                    ticks = new
+                    {
+                        autoSkip = true,
+                        maxRotation = 0,
+                        minRotation = 0
+                    }
                 },
-                Y = new() { Min = 0, Max = Math.Ceiling(maxPressure) }
-            };
-
-            await chart.AddLabelsDatasetsAndUpdate(
-                labels,
-                new LineChartDataset<double>
+                y = new
                 {
-                    Label = "Pressure (PSI)",
-                    Data = values,
-                    Fill = false,
-                    BackgroundColor = "#007bff",
-                    BorderWidth = 2
-                });
-        }
+                    beginAtZero = true
+                }
+            }
+        };
+
+        await JS.InvokeVoidAsync("renderPressureChart", "pressureChart", chartData, chartOptions);
     }
 
-    public class PlotQuery
+    private int PickStepSize(double totalMinutes)
     {
-        public string SensorId { get; set; }
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
+        int[] intervals = { 1, 5, 15, 30, 60, 180, 360, 720, 1440 };
+        foreach (var i in intervals)
+        {
+            var ticks = totalMinutes / i;
+            if (ticks >= 10 && ticks <= 25)
+                return i;
+        }
+        return intervals.Last();
     }
 }
-
