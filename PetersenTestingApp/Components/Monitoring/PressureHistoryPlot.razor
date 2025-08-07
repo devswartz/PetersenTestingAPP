@@ -3,10 +3,11 @@
 
 @if (Data?.Any() == true)
 {
-    <div class="w-full bg-white p-4 rounded shadow">
-        <canvas id="pressureChart" class="w-full"></canvas>
+    <div class="bg-white p-4 rounded shadow">
+        <div class="flex justify-center">
+            <canvas id="pressureChart" width="800" height="400"></canvas>
+        </div>
     </div>
-
 }
 
 @code {
@@ -24,7 +25,6 @@
 
     private async Task RenderChartAsync()
     {
-        Console.WriteLine($"Rendering chart with {Data.Count} readings from {Data.First().TimeStamp} to {Data.Last().TimeStamp}");
         var labels = Data.Select(p => p.TimeStamp.ToString("o")).ToList();
         var values = Data.Select(p => p.PressurePSI).ToList();
 
@@ -52,8 +52,7 @@
         var chartOptions = new
         {
             responsive = true,
-            maintainAspectRatio = true,
-            aspectRatio = 2,
+            maintainAspectRatio = false,
             plugins = new
             {
                 title = new
@@ -83,6 +82,12 @@
                             day = "MM/dd"
                         }
                     },
+                    title = new
+                    {
+                        display = true,
+                        text = "Time",
+                        font = new { size = 14 }
+                    },
                     ticks = new
                     {
                         autoSkip = true,
@@ -92,7 +97,13 @@
                 },
                 y = new
                 {
-                    beginAtZero = true
+                    beginAtZero = true,
+                    title = new
+                    {
+                        display = true,
+                        text = "Pressure (PSI)",
+                        font = new { size = 14 }
+                    }
                 }
             }
         };
