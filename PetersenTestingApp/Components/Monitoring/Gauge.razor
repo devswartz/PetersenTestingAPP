@@ -1,0 +1,32 @@
+﻿@code {
+    [Parameter] public double Value { get; set; }              // Current value
+    [Parameter] public double Max { get; set; } = 100;         // Maximum value
+    [Parameter] public string Color { get; set; } = "#3b82f6"; // Default stroke color (blue)
+    [Parameter] public int Size { get; set; } = 150;           // Width & height of SVG
+}
+
+<svg width="@Size" height="@(Size / 2)" viewBox="0 0 100 50">
+    <!-- Background arc -->
+    <path d="M10,50 A40,40 0 0,1 90,50" fill="none" stroke="#e5e7eb" stroke-width="8" />
+
+    <!-- Colored arc for value -->
+    @{
+        var percent = Math.Clamp(Value / Max, 0, 1);
+        var angle = 180 * percent;
+        var rad = Math.PI * angle / 180;
+        var x = 50 + 40 * Math.Cos(Math.PI - rad);
+        var y = 50 - 40 * Math.Sin(Math.PI - rad);
+        var largeArcFlag = angle > 180 ? 1 : 0;
+    }
+
+    <path d="M10,50 A40,40 0 0,1 @(x),@(y)" fill="none" stroke="@Color" stroke-width="8" />
+
+    <!-- Needle -->
+    @{
+        var needleAngle = Math.PI - (Math.PI * percent);
+        var needleX = 50 + 35 * Math.Cos(needleAngle);
+        var needleY = 50 - 35 * Math.Sin(needleAngle);
+    }
+    <line x1="50" y1="50" x2="@needleX" y2="@needleY" stroke="#000" stroke-width="2" />
+</svg>
+
