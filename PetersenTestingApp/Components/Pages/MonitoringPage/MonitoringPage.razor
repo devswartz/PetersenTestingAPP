@@ -1,8 +1,8 @@
-@page "/monitoring"
+﻿@page "/monitoring"
 @using PetersenTestingApp.Components.Monitoring
 @using PetersenTestingAppLibrary.Classes
 
-<div class="p-6 space-y-10">
+<div class="p-6 space-y-10 w-full">
 
     <!-- Header -->
     <h1 class="text-3xl font-bold mb-4">Pressure Monitoring Dashboard</h1>
@@ -32,21 +32,38 @@
     <div class="mt-12 space-y-6 w-full px-4">
         <h2 class="text-2xl font-bold text-center">Historical Pressure Plot</h2>
 
-        <EditForm Model="query" OnValidSubmit="OnQuerySubmit" class="flex flex-wrap gap-4 justify-center bg-white p-4 rounded shadow w-full">
-            <div class="flex flex-col p-2">
-                <label for="sensorId" class="text-sm font-medium text-gray-700">Sensor ID</label>
-                <InputText id="sensorId" @bind-Value="query.SensorId" class="form-input mt-1 p-2 rounded" />
-            </div>
-            <div class="flex flex-col p-2">
-                <label for="startDate" class="text-sm font-medium text-gray-700">Start</label>
-                <input id="startDate" type="datetime-local" class="form-input mt-1 p-2 rounded" @bind="query.StartDate" />
-            </div>
-            <div class="flex flex-col p-2">
-                <label for="endDate" class="text-sm font-medium text-gray-700">End</label>
-                <input id="endDate" type="datetime-local" class="form-input mt-1 p-2 rounded" @bind="query.EndDate" />
-            </div>
-            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded shadow">Plot</button>
-        </EditForm>
+        <div class="flex justify-center w-full py-6">
+            <EditForm Model="query" OnValidSubmit="OnQuerySubmit"
+                      class="flex items-end gap-x-4 bg-white p-6 rounded shadow">
+
+                <div class="flex flex-col px-2">
+                    <label class="text-sm font-medium text-gray-700 mb-1">Sensor ID</label>
+                    <InputText @bind-Value="query.SensorId"
+                               class="border border-gray-300 rounded px-3 py-2 w-48" />
+                </div>
+
+                <div class="flex flex-col px-2">
+                    <label class="text-sm font-medium text-gray-700 mb-1">Start</label>
+                    <input type="datetime-local" @bind="query.StartDate"
+                           class="border border-gray-300 rounded px-3 py-2 w-60" />
+                </div>
+
+                <div class="flex flex-col px-2">
+                    <label class="text-sm font-medium text-gray-700 mb-1">End</label>
+                    <input type="datetime-local" @bind="query.EndDate"
+                           class="border border-gray-300 rounded px-3 py-2 w-60" />
+                </div>
+
+                <div class="flex flex-col px-2">
+                    <label class="invisible">Plot</label>
+                    <button type="submit"
+                            class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full h-[42px]">
+                        Plot
+                    </button>
+                </div>
+
+            </EditForm>
+        </div>
 
         @if (!string.IsNullOrEmpty(errorMessage))
         {
