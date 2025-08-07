@@ -1,0 +1,27 @@
+<div class="bg-white rounded-xl shadow p-4 w-[320px] h-[260px] flex flex-col justify-between">
+    <!-- Header -->
+    <!-- Header -->
+    <div class="flex justify-between items-center px-2">
+        <h3 class="text-xl font-semibold pl-2">Sensor @Reading.SensorID</h3>
+        <div class="text-sm text-gray-500 pr-2">@Reading.BatteryVoltage.ToString("0.00") V</div>
+    </div>
+
+    <!-- Gauges -->
+    <div class="flex flex-row justify-center gap-4">
+        <div class="flex flex-col items-center">
+            <Gauge Value="@Reading.Temperature" Max="100" Color="#fbbf24" Size="120" />
+            <div class="text-sm text-center mt-1 font-medium">Temp: @Reading.Temperature.ToString("0.0") °F</div>
+        </div>
+
+        <div class="flex flex-col items-center">
+            <Gauge Value="@Reading.PressurePSI" Max="600" Color="#3b82f6" Size="120" />
+            <div class="text-sm text-center mt-1 font-medium">Pressure: @Reading.PressurePSI.ToString("0") PSI</div>
+        </div>
+    </div>
+
+
+    <!-- Timestamp -->
+    <div class="text-center text-sm text-gray-400 mt-2">
+        @Reading.TimeStamp.ToString("yyyy-MM-dd HH:mm")
+    </div>
+</div>
