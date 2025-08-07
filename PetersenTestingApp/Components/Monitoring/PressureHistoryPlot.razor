@@ -1,5 +1,9 @@
-﻿<div class="p-4 border bg-light rounded mb-4">
+<div class="p-4 border bg-light rounded mb-4">
     <h5 class="mb-3">Select Sensor and Date Range</h5>
+    @if (!string.IsNullOrEmpty(validationMessage))
+    {
+        <div class="alert alert-warning">@validationMessage</div>
+    }
     <EditForm Model="@query" OnValidSubmit="OnQuerySubmit">
         <div class="mb-2">
             <label>Sensor ID</label>
@@ -8,14 +12,14 @@
 
         <div class="mb-2">
             <label>Start Date / Time</label>
-            <InputDate @bind-Value="query.StartDate" class="form-control" />
-            <InputDate Type="InputDateType.Time" @bind-Value="query.StartDate" class="form-control mt-1" />
+            <InputDate @bind-Value="startDate" class="form-control" />
+            <InputDate Type="InputDateType.Time" @bind-Value="startTime" class="form-control mt-1" />
         </div>
 
         <div class="mb-2">
             <label>End Date / Time</label>
-            <InputDate @bind-Value="query.EndDate" class="form-control" />
-            <InputDate Type = "InputDateType.Time" @bind-Value="query.EndDate" class="form-control mt-1" />
+            <InputDate @bind-Value="endDate" class="form-control" />
+            <InputDate Type="InputDateType.Time" @bind-Value="endTime" class="form-control mt-1" />
         </div>
 
         <button type="submit" class="btn btn-primary mt-3">Plot</button>
@@ -31,11 +35,10 @@ else if (plotData != null)
     <p class="text-muted">No data found for the selected sensor and date range.</p>
 }
 
-
 @code {
     private LineChart<double> chart;
     private List<SensorReading> plotData;
-
+    private string? validationMessage;
 
     private LineChartOptions chartOptions = new()
     {
@@ -50,16 +53,29 @@ else if (plotData != null)
         }
     };
 
-    private PlotQuery query = new()
-    {
-        StartDate = DateTime.UtcNow.AddHours(-12),
-        EndDate = DateTime.UtcNow
-    };
+    private PlotQuery query = new();
+
+    private DateTime startDate = DateTime.UtcNow.AddHours(-12).Date;
+    private DateTime startTime = DateTime.UtcNow.AddHours(-12);
+    private DateTime endDate = DateTime.UtcNow.Date;
+    private DateTime endTime = DateTime.UtcNow;
 
     async Task OnQuerySubmit()
     {
+        if (string.IsNullOrWhiteSpace(query.SensorId))
+        {
+            validationMessage = "Sensor ID is required.";
+            plotData = null;
+            return;
+        }
+
+        validationMessage = null;
+
+        query.StartDate = startDate.Date + startTime.TimeOfDay;
+        query.EndDate = endDate.Date + endTime.TimeOfDay;
+
         plotData = await DashboardBackendService
-    .GetSensorReadingsForDateRangeAsync(query.SensorId, query.StartDate, query.EndDate);
+            .GetSensorReadingsForDateRangeAsync(query.SensorId, query.StartDate, query.EndDate);
 
         StateHasChanged(); // force rerender so chart appears
 
@@ -83,8 +99,6 @@ else if (plotData != null)
                     BorderWidth = 2
                 });
         }
-
-
     }
 
     public class PlotQuery
@@ -94,3 +108,4 @@ else if (plotData != null)
         public DateTime EndDate { get; set; }
     }
 }
+
