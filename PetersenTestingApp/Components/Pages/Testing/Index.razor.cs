@@ -98,11 +98,14 @@ namespace PetersenTestingApp.Components.Pages.Testing
             isTop = false;
             FilteredHeaders = (await TestingService.GetFilteredHeaders(MoRefSearch, ItemSearch, StatusSearch)).OrderByDescending(h => h.HeaderId).ToList();
             await InvokeAsync(StateHasChanged);
+
         }
 
         public async Task showTopData()
         {
             TopListHeaders = await TestingService.GetTopTestHeader();
+
+            //FilteredHeaders = await TestingService.GetTopTestHeader();
             MoRefSearch = string.Empty;
             ItemSearch = string.Empty;
 

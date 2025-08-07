@@ -40,89 +40,108 @@
                         <input class="text-sm" type="text" value="@ItemSearch" @oninput="OnSearchItemInput" placeholder="Item Number" />
                     </div>
 
+                    <!--
+                    <div>
+                        <label for="closed_status">Closed Status</label>
+                        <select class="text-sm" value="@StatusSearch" @onchange="_ => DebouncedSearchAsync()" id="closed_status">
+                            <option value="0">No</option>
+                            <option value="1">Yes</option>
+                            <option value="2" selected>All</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <input class="text-sm" type="text" @bind-value="MoRefSearch" @bind-value:event="OnSearchMoInput" placeholder="mo reference" />
+                    </div>
+                    <div>
+                        <input class="text-sm" type="text" @bind-value="ItemSearch" @bind-value:event="OnSearchItemInput" placeholder="Item Number" />
+                    </div>
+                    -->
+
+
                 </div>
 
                 <div class="flex justify-between space-x-2">
 
-                    <div class="h-[35vh] overflow-y-auto border border-gray-200 rounded px-2 py-1 text-xs ">
+                    <div class="h-[35vh] overflow-y-auto border border-gray-200 rounded px-2 text-xs ">
 
-                    <!-- Header Row -->
-                    <div class="grid grid-cols-[1fr_100px_100px_100px_1fr_100px_100px_100px_100px_100px_100px_100px_100px_1fr] font-semibold border-b border-gray-400 pb-1 pt-1 mb-1 sticky top-0 z-5 bg-white">
-                        <div>CustomerName</div>
-                        <div>Ref Num</div>
-                        <div>Test Num</div>
-                        <div>Item</div>
-                        <div>ItemDesc</div>
-                        <div>Order Date</div>
-                        <div>Due Date</div>
-                        <div>Rated PSI</div>
-                        <div>Deflated Dia</div>
-                        <div>Max Inflated Dia</div>
-                        <div>Closed</div>
-                        <div>Closed Date Time</div>
-                        <div>User</div>
-                        <div>Last Entry</div>
+                        <!-- Header Row -->
+                        <div class="grid grid-cols-[1fr_100px_100px_100px_1fr_100px_100px_100px_100px_100px_100px_100px_100px] font-semibold border-b border-gray-400 pb-1 pt-1 mb-1 sticky top-0 z-5 bg-white">
 
-                    </div>
+                            <div>CustomerName</div>
+                            <div>Ref Num</div>
+                            <div>Test Num</div>
+                            <div>Item</div>
+                            <div>ItemDesc</div>
+                            <div>Order Date</div>
+                            <div>Due Date</div>
+                            <div>Rated PSI</div>
+                            <div>Deflated Dia</div>
+                            <div>Max Inflated Dia</div>
+                            <div>Closed</div>
+                            <div>Closed Date Time</div>
+                            <div>User</div>
 
-                    @if(isTop && TopListHeaders?.Any() == true)
-                    {               
-                        <!-- Data Rows -->
-                        @foreach (var p in TopListHeaders)
-                        {
-                                <div class="cursor-pointer grid grid-cols-[1fr_100px_100px_100px_1fr_100px_100px_100px_100px_100px_100px_100px_100px_1fr] border-b border-gray-100 py-1 hover:bg-gray-50">
-                                <div class="whitespace-nowrap overflow-hidden text-ellipsis" @onclick="()=>GetItemData(p.HeaderId)">@p.CustomerName</div>
-                                <div @onclick="()=>GetItemData(p.HeaderId)">@p.ReferenceNumber</div>
-                                <div @onclick="()=>GetItemData(p.HeaderId)">@p.TestNumber</div>
-                                <div @onclick="()=>GetItemData(p.HeaderId)">@p.Item</div>
-                                <div class="whitespace-nowrap overflow-hidden text-ellipsis" @onclick="()=>GetItemData(p.HeaderId)">@p.ItemDesc</div>
-                                <div @onclick="()=>GetItemData(p.HeaderId)">@p.ORDDate?.ToString("MM-dd-yyyy")</div>
-                                <div @onclick="()=>GetItemData(p.HeaderId)">@p.DueDate?.ToString("MM-dd-yyyy")</div>
-                                <div @onclick="()=>GetItemData(p.HeaderId)">@p.RatedMaxInflationPSI</div>
-                                <div @onclick="()=>GetItemData(p.HeaderId)">@p.DeflatedOrInternalDiaInches</div>
-                                <div @onclick="()=>GetItemData(p.HeaderId)">@p.MaxInflatedDiaInches</div>
-                                <div @onclick="()=>GetItemData(p.HeaderId)">@p.Closed</div>
-                                <div class="whitespace-nowrap overflow-hidden text-ellipsis" @onclick="()=>GetItemData(p.HeaderId)">@p.ClosedDT</div> 
-                                <div @onclick="()=>GetItemData(p.HeaderId)">@p.AudtUser</div>
-                                <div @onclick="()=>GetItemData(p.HeaderId)">@p.LastEntryDate</div>
-                            </div>
-                        }
-                    
-                    }
 
-                    else if (!isTop && FilteredHeaders?.Any() == true)
-                    {
+                            @if (isTop && TopListHeaders?.Any() == true)
+                            {
+                                <!-- Data Rows -->
+                                @foreach (var p in TopListHeaders)
+                                {
 
-                        <!-- Data Rows -->
-                        @foreach (var p in FilteredHeaders)
-                        {
-                            <div class="cursor-pointer grid grid-cols-[1fr_100px_100px_100px_1fr_100px_100px_100px_100px_100px_100px_100px_100px] border-b border-gray-100 py-1 hover:bg-gray-50 ">
-                                <div class="whitespace-nowrap overflow-hidden text-ellipsis" @onclick="()=>GetItemData(p.HeaderId)">@p.CustomerName</div>
-                                <div @onclick="()=>GetItemData(p.HeaderId)">@p.ReferenceNumber</div>
-                                <div @onclick="()=>GetItemData(p.HeaderId)">@p.TestNumber</div>
-                                <div @onclick="()=>GetItemData(p.HeaderId)">@p.Item</div>
-                                <div class="whitespace-nowrap overflow-hidden text-ellipsis" @onclick="()=>GetItemData(p.HeaderId)">@p.ItemDesc</div>
-                                <div @onclick="()=>GetItemData(p.HeaderId)">@p.ORDDate?.ToString("MM-dd-yyyy")</div>
-                                <div @onclick="()=>GetItemData(p.HeaderId)">@p.DueDate?.ToString("MM-dd-yyyy")</div>
-                                <div @onclick="()=>GetItemData(p.HeaderId)">@p.RatedMaxInflationPSI</div>
-                                <div @onclick="()=>GetItemData(p.HeaderId)">@p.DeflatedOrInternalDiaInches</div>
-                                <div @onclick="()=>GetItemData(p.HeaderId)">@p.MaxInflatedDiaInches</div>
-                                <div @onclick="()=>GetItemData(p.HeaderId)">@p.Closed</div>
-                                <div class="whitespace-nowrap overflow-hidden text-ellipsis" @onclick="()=>GetItemData(p.HeaderId)">@p.ClosedDT</div> 
-                                <div @onclick="()=>GetItemData(p.HeaderId)">@p.AudtUser</div>
-                                    
-                            </div>
-                        }
+                                    <div class="whitespace-nowrap overflow-hidden text-ellipsis border-b border-gray-100" @onclick="() => GetItemData(p.HeaderId)">@p.CustomerName</div>
+                                    <div class="border-b border-gray-100" @onclick="() => GetItemData(p.HeaderId)">@p.ReferenceNumber</div>
+                                    <div class="border-b border-gray-100" @onclick="() => GetItemData(p.HeaderId)">@p.TestNumber</div>
+                                    <div class="border-b border-gray-100" @onclick="() => GetItemData(p.HeaderId)">@p.Item</div>
+                                    <div class="whitespace-nowrap overflow-hidden text-ellipsis border-gray-100" @onclick="() => GetItemData(p.HeaderId)">@p.ItemDesc</div>
+                                    <div class="border-b border-gray-100" @onclick="() => GetItemData(p.HeaderId)">@p.ORDDate?.ToString("MM-dd-yyyy")</div>
+                                    <div class="border-b border-gray-100" @onclick="() => GetItemData(p.HeaderId)">@p.DueDate?.ToString("MM-dd-yyyy")</div>
+                                    <div class="border-b border-gray-100" @onclick="() => GetItemData(p.HeaderId)">@p.RatedMaxInflationPSI</div>
+                                    <div class="border-b border-gray-100" @onclick="() => GetItemData(p.HeaderId)">@p.DeflatedOrInternalDiaInches</div>
+                                    <div class="border-b border-gray-100" @onclick="() => GetItemData(p.HeaderId)">@p.MaxInflatedDiaInches</div>
+                                    <div class="border-b border-gray-100" @onclick="() => GetItemData(p.HeaderId)">@p.Closed</div>
+                                    <div class="whitespace-nowrap overflow-hidden text-ellipsis border-gray-100" @onclick="() => GetItemData(p.HeaderId)">@p.ClosedDT</div>
+                                    <div class="border-b border-gray-100" @onclick="() => GetItemData(p.HeaderId)">@p.AudtUser</div>
 
-                    }
+                                }
+                            }
 
-                    else
-                    {
-                        <div class="grid grid-cols-[1fr_100px_100px_100px_1fr_100px_100px_100px_100px_100px_100px_100px_100px_1fr]  text-center text-gray-500 py-4">
-                            No items to display.
+                            else if (!isTop && FilteredHeaders?.Any() == true)
+                            {
+
+                                <!-- Data Rows -->
+                                @foreach (var p in FilteredHeaders)
+                                {
+
+                                    <div class="whitespace-nowrap overflow-hidden text-ellipsis border-b border-gray-100" @onclick="() => GetItemData(p.HeaderId)">@p.CustomerName</div>
+                                    <div class="border-b border-gray-100" @onclick="() => GetItemData(p.HeaderId)">@p.ReferenceNumber</div>
+                                    <div class="border-b border-gray-100" @onclick="() => GetItemData(p.HeaderId)">@p.TestNumber</div>
+                                    <div class="border-b border-gray-100" @onclick="() => GetItemData(p.HeaderId)">@p.Item</div>
+                                    <div class="whitespace-nowrap overflow-hidden text-ellipsis border-gray-100" @onclick="() => GetItemData(p.HeaderId)">@p.ItemDesc</div>
+                                    <div class="border-b border-gray-100" @onclick="() => GetItemData(p.HeaderId)">@p.ORDDate?.ToString("MM-dd-yyyy")</div>
+                                    <div class="border-b border-gray-100" @onclick="() => GetItemData(p.HeaderId)">@p.DueDate?.ToString("MM-dd-yyyy")</div>
+                                    <div class="border-b border-gray-100" @onclick="() => GetItemData(p.HeaderId)">@p.RatedMaxInflationPSI</div>
+                                    <div class="border-b border-gray-100" @onclick="() => GetItemData(p.HeaderId)">@p.DeflatedOrInternalDiaInches</div>
+                                    <div class="border-b border-gray-100" @onclick="() => GetItemData(p.HeaderId)">@p.MaxInflatedDiaInches</div>
+                                    <div class="border-b border-gray-100" @onclick="() => GetItemData(p.HeaderId)">@p.Closed</div>
+                                    <div class="whitespace-nowrap overflow-hidden text-ellipsis border-gray-100" @onclick="() => GetItemData(p.HeaderId)">@p.ClosedDT</div>
+                                    <div class="border-b border-gray-100" @onclick="() => GetItemData(p.HeaderId)">@p.AudtUser</div>
+
+
+                                }
+
+                            }
+                            
+
+
+                            else
+                            {
+                                <div class="col-span-13  text-center text-gray-500 py-4">
+                                    No items to display.
+                                </div>
+                            }
+
                         </div>
-                    }
-
                     
 
                     </div>
@@ -259,6 +278,7 @@
                         }
 
                     </div>
+
 
                     <div class="w-[45%] border rounded p-2 bg-white shadow-sm space-y-1">
 
