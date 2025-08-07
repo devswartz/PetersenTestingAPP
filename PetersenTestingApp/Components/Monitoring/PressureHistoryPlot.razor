@@ -85,8 +85,57 @@ else if (plotData != null)
         {
             await chart.Clear();
 
-            var labels = plotData.Select(p => p.TimeStamp.ToString("yyyy-MM-dd HH:mm")).ToList();
+            var labels = plotData.Select(p => p.TimeStamp.ToString("o")).ToList();
             var values = plotData.Select(p => (double)p.PressurePSI).ToList();
+
+            var maxPressure = values.Any() ? values.Max() : 0;
+
+            var totalMinutes = (query.EndDate - query.StartDate).TotalMinutes;
+            int[] intervals = new[] { 1, 5, 15, 30, 60, 360, 720, 1440 };
+            int chosenInterval = intervals.Last();
+            foreach (var candidate in intervals)
+            {
+                var ticks = totalMinutes / candidate;
+                if (ticks >= 10 && ticks <= 25)
+                {
+                    chosenInterval = candidate;
+                    break;
+                }
+            }
+
+            string unit = "day";
+            int stepSize = 1;
+            if (chosenInterval < 60)
+            {
+                unit = "minute";
+                stepSize = chosenInterval;
+            }
+            else if (chosenInterval < 1440)
+            {
+                unit = "hour";
+                stepSize = chosenInterval / 60;
+            }
+
+            chartOptions.Scales = new()
+            {
+                X = new()
+                {
+                    Type = "time",
+                    Time = new()
+                    {
+                        Unit = unit,
+                        StepSize = stepSize,
+                        DisplayFormats = new()
+                        {
+                            Day = "MM/dd HH:mm",
+                            Hour = "MM/dd HH:mm",
+                            Minute = "MM/dd HH:mm"
+                        }
+                    },
+                    Ticks = new() { MaxTicksLimit = 25 }
+                },
+                Y = new() { Min = 0, Max = Math.Ceiling(maxPressure) }
+            };
 
             await chart.AddLabelsDatasetsAndUpdate(
                 labels,
