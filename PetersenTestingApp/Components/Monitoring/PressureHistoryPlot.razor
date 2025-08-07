@@ -3,7 +3,9 @@
 
 @if (Data?.Any() == true)
 {
-    <canvas id="pressureChart" style="width: 100%; height: 400px;"></canvas>
+    <div class="w-full h-96 bg-white p-4 rounded shadow">
+        <canvas id="pressureChart" class="w-full h-full"></canvas>
+    </div>
 
 }
 
@@ -50,6 +52,7 @@
         var chartOptions = new
         {
             responsive = true,
+            maintainAspectRatio = false,
             plugins = new
             {
                 title = new
