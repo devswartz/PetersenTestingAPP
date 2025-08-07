@@ -10,9 +10,9 @@ namespace PetersenTestingAppLibrary.Classes
     {
         public int DetailID { get; set; }
         public int HeaderID { get; set; }
-        public string ReferenceNumber { get; set; }
-        public int ORDUNIQ { get; set; }
-        public string Item {  get; set; }
+        public string? ReferenceNumber { get; set; }
+        public int? ORDUNIQ { get; set; }
+        public string? Item {  get; set; }
         public DateTime TestDate { get; set; } = DateTime.Now;
         public DateTime TestTime { get; set; } = DateTime.Now;
         public DateTime StartTestDateTime {  get; set; } = DateTime.Now;
@@ -23,7 +23,7 @@ namespace PetersenTestingAppLibrary.Classes
         public string Comments {  get; set; }
         public string AUDTUser { get; set; }
         public DateTime AUDTTime { get; set; }
-        public PetersenUser? AUDUser { get; set; }
+        public string? AUDUser { get; set; }
         public string TestNumber { get; set; }
         public string Initial {  get; set; }
         public DateTime TestEndDate {  get; set; }
