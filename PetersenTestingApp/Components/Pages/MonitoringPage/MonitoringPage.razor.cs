@@ -11,6 +11,7 @@ public partial class MonitoringPage : ComponentBase
     [Inject] private IJSRuntime JS { get; set; }
     private List<SensorReading> liveReadings = new();
     private List<SensorReading> plotData = new();
+    private string? errorMessage;
 
     private PlotQuery query = new()
     {
@@ -24,12 +25,19 @@ public partial class MonitoringPage : ComponentBase
     }
     private async Task OnQuerySubmit()
     {
+        if (string.IsNullOrWhiteSpace(query.SensorId))
+        {
+            errorMessage = "Please enter a sensor ID.";
+            return;
+        }
+
         plotData = await DashboardBackendService
             .GetSensorReadingsForDateRangeAsync(query.SensorId, query.StartDate, query.EndDate);
 
         if (plotData is null || !plotData.Any())
             return;
 
+        errorMessage = null;
         await InvokeAsync(StateHasChanged); // ensures UI re-renders
     }
 
